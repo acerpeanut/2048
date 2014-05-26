@@ -1,0 +1,173 @@
+<html>
+<script type="text/javascript">
+var cxt;
+var img=new Array();
+	var d2048=new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+	function show(){
+		for(i=0;i<16;i++){
+			cxt.drawImage(img[i],i/4*100,i%4*100)
+		}
+	}
+	function gene(){
+		p=0
+		var a=[]
+		for(i=0;i<16;i++){
+			if(d2048[i]!=0){
+				a[p]=i;
+				p++;
+			}
+		}
+		var gen = Math.floor(Math.random()*2+1)*2
+		d2048[Math.floor(Math.random()*p)]=gen
+	}
+	function left(){
+		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for(i=0;i<4;i++){  // move left
+			p=i*4;
+			for(j=0;j<4;j++){
+				n=i*4+j;
+				if(d2048[n]!=0){
+					a[p]=d2048[n]
+					p+=1;
+				}
+			}
+		}
+		for(i=0;i<4;i++){ // merge
+			p=i*4;
+			for(j=0;j<3;j++){
+				n=i*4+j
+				n1=i*4+j+1
+				if(a[n]!=0 && a[n1]==a[n]){
+					a[p] = 2*a[n];
+					j++
+				}
+				else{
+					a[p] = a[n]
+				}
+				p+=1
+			}
+		}
+		for(i=0;i<16;i++){ // copy
+			d2048[i]=a[i]
+		}
+	}
+	function right(){
+		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for(i=0;i<4;i++){  // move right
+			p=i*4+3;
+			for(j=0;j<4;j++){
+				n=i*4+3-j;
+				if(d2048[n]!=0){
+					a[p]=d2048[n]
+					p-=1;
+				}
+			}
+		}
+		for(i=0;i<4;i++){ // merge
+			p=i*4+3;
+			for(j=0;j<3;j++){
+				n=i*4+3-j
+				n1=i*4+2-j
+				if(a[n]!=0 && a[n1]==a[n]){
+					a[p] = 2*a[n];
+					p-=1
+					j++
+				}
+				else{
+					a[p] = a[n]
+					p-=1
+				}
+			}
+		}
+		for(i=0;i<16;i++){ // copy
+			d2048[i]=a[i]
+		}
+	}
+	function top(){
+		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for(i=0;i<4;i++){  // move top
+			p=i; // i is j
+			for(j=0;j<4;j++){
+				n=j*4+i;
+				if(d2048[n]!=0){
+					a[p]=d2048[n]
+					p+=4;
+				}
+			}
+		}
+		for(i=0;i<4;i++){ // merge
+			p=i;
+			for(j=0;j<3;j++){
+				n=i+j*4
+				n1=i+(j+1)*4
+				if(a[n]!=0 && a[n1]==a[n]){
+					a[p] = 2*a[n];
+					p+=4
+					j++
+				}
+				else{
+					a[p] = a[n]
+					p+=4
+				}
+			}
+		}
+		for(i=0;i<16;i++){ // copy
+			d2048[i]=a[i]
+		}
+	}
+	function bottom(){
+		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for(i=0;i<4;i++){  // move bottom
+			p=i+3*4;
+			for(j=0;j<4;j++){
+				n=i+(3-j)*4;
+				if(d2048[n]!=0){
+					a[p]=d2048[n]
+					p-=4;
+				}
+			}
+		}
+		for(i=0;i<4;i++){ // merge
+			p=i+3*4;
+			for(j=0;j<4;j++){
+				n=i+(3-j)*4
+				n1=i+(2-j)*4
+				if(a[n]!=0 && a[n1]==a[n]){
+					a[p] = 2*a[n];
+					p-=4
+					j++
+				}
+				else{
+					a[p] = a[n]
+					p-=4
+				}
+			}
+		}
+		for(i=0;i<16;i++){ // copy
+			d2048[i]=a[i]
+		}
+	}
+</script>
+<body>
+<img id="bg" src="beijing.png" display="none"/>
+<img id="n0" src="0.png" display="none" />
+<img id="n2" src="2.png" display="none" />
+<img id="n4" src="4.png" display="none" />
+<img id="n8" src="8.png" display="none" />
+<img id="n16" src="16.png" display="none" />
+<img id="n32" src="32.png" display="none" />
+<img id="n64" src="64.png" display="none" />
+<img id="n128" src="128.png" display="none" />
+<img id="n256" src="256.png" display="none" />
+<img id="n512" src="512.png" display="none" />
+<img id="n1024" src="1024.png" display="none" />
+<img id="n2048" src="2048.png" display="none" />
+<img id="n4096" src="4096.png" display="none" />
+<canvas id="can" width="500" height="500">
+</canvas>
+<script>
+	var c=document.getElementById("can")
+	cxt = c.getContext("2d");
+</script>
+</body>
+</html>
