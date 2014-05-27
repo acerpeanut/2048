@@ -1,39 +1,100 @@
 <html>
 <script type="text/javascript">
 var cxt;
+var firstP=[0,0];
+var secondP=[0,0];
 var img=new Array();
+var beijing;
 	var d2048=new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 	function show(){
-		for(i=0;i<16;i++){
-			cxt.drawImage(img[i],i/4*100,i%4*100)
+		cxt.drawImage(beijing,0,0)
+		for(var i=0;i<16;i++){
+			q=0
+			p=d2048[i]
+			if(p!=0){         // get the exponent
+				while(Math.floor(p/2) != 0){
+		//			alert(p/2+"")
+					q++
+					p=p/2
+				}
+			}
+			cxt.drawImage(img[q],Math.floor(i%4)*100,Math.floor(i/4)*150)
 		}
 	}
 	function gene(){
 		p=0
 		var a=[]
 		for(i=0;i<16;i++){
-			if(d2048[i]!=0){
+			if(d2048[i]==0){
 				a[p]=i;
 				p++;
 			}
 		}
 		var gen = Math.floor(Math.random()*2+1)*2
-		d2048[Math.floor(Math.random()*p)]=gen
+		q=Math.floor(Math.random()*p)
+		
+		d2048[a[q]]=gen
+	//	alert("gen:"+gen+"\nposition:"+a[q]+"\nblank:"+p)
 	}
-	function left(){
+	function lead(d){   // left0 right1 top2 bottom3
+		var next=new Array(1,-1,4,-4)
+		var start=new Array(0,3,0,12)
+		var nextLine=new Array(4,4,1,1)
 		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		for(i=0;i<4;i++){  // move left
-			p=i*4;
+		var b=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for(i=0;i<4;i++){                  // move
+			p=start[d] + i*nextLine[d]
+			n=p
 			for(j=0;j<4;j++){
-				n=i*4+j;
+				if(d2048[n] != 0){
+					a[p] = d2048[n]
+					p+=next[d]
+				}
+				n+=next[d]
+			}
+		}
+		for(i=0;i<4;i++){                  // merge
+			p=start[d] + i*nextLine[d]
+			n=p
+			count=0
+			for(j=0;j<4;j++){
+				if((j<3) && (count<4) && (a[n]==a[n+next[d]]) && (a[n]!=0)){
+					b[p]=2*a[n]
+					n+=next[d]
+					count++
+				}
+				else if(count<4){
+					b[p]=a[n]
+				}
+				else{
+					b[p]=0
+				}
+				p+=next[d]
+				n+=next[d]
+				count++
+			}
+		}
+		for(i=0;i<16;i++){
+			d2048[i]=b[i]
+		}
+	}
+/*	function leadLeft(){
+		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		next=1
+		for(i=0;i<4;i++){  // move left
+			p=i*4;                            // if you modified
+			n=p;
+			for(j=0;j<4;j++){
 				if(d2048[n]!=0){
 					a[p]=d2048[n]
-					p+=1;
+					p+=next;
 				}
+				n+=next
 			}
 		}
 		for(i=0;i<4;i++){ // merge
 			p=i*4;
+			e=p+3*next
 			for(j=0;j<3;j++){
 				n=i*4+j
 				n1=i*4+j+1
@@ -44,130 +105,90 @@ var img=new Array();
 				else{
 					a[p] = a[n]
 				}
-				p+=1
+				p+=next
+			}
+			while(p!=e){
+				a[p] = 0
+				p+=next
 			}
 		}
 		for(i=0;i<16;i++){ // copy
 			d2048[i]=a[i]
 		}
 	}
-	function right(){
-		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		for(i=0;i<4;i++){  // move right
-			p=i*4+3;
-			for(j=0;j<4;j++){
-				n=i*4+3-j;
-				if(d2048[n]!=0){
-					a[p]=d2048[n]
-					p-=1;
-				}
-			}
-		}
-		for(i=0;i<4;i++){ // merge
-			p=i*4+3;
-			for(j=0;j<3;j++){
-				n=i*4+3-j
-				n1=i*4+2-j
-				if(a[n]!=0 && a[n1]==a[n]){
-					a[p] = 2*a[n];
-					p-=1
-					j++
-				}
-				else{
-					a[p] = a[n]
-					p-=1
-				}
-			}
-		}
-		for(i=0;i<16;i++){ // copy
-			d2048[i]=a[i]
-		}
+	*/
+	function leadLeft(){
+		lead(0)
 	}
-	function top(){
-		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		for(i=0;i<4;i++){  // move top
-			p=i; // i is j
-			for(j=0;j<4;j++){
-				n=j*4+i;
-				if(d2048[n]!=0){
-					a[p]=d2048[n]
-					p+=4;
-				}
-			}
-		}
-		for(i=0;i<4;i++){ // merge
-			p=i;
-			for(j=0;j<3;j++){
-				n=i+j*4
-				n1=i+(j+1)*4
-				if(a[n]!=0 && a[n1]==a[n]){
-					a[p] = 2*a[n];
-					p+=4
-					j++
-				}
-				else{
-					a[p] = a[n]
-					p+=4
-				}
-			}
-		}
-		for(i=0;i<16;i++){ // copy
-			d2048[i]=a[i]
-		}
+	function leadRight(){
+		lead(1)
 	}
-	function bottom(){
-		var a=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		for(i=0;i<4;i++){  // move bottom
-			p=i+3*4;
-			for(j=0;j<4;j++){
-				n=i+(3-j)*4;
-				if(d2048[n]!=0){
-					a[p]=d2048[n]
-					p-=4;
-				}
+	function leadTop(){
+		lead(2)
+	}
+	function leadBottom(){
+		lead(3)
+	}
+	function pressM(e){
+		firstP[0] = e.clientX
+		firstP[1] = e.clientY
+	}
+	function handleMouse(e){
+		secondP[0] = e.clientX
+		secondP[1] = e.clientY
+
+		x1=secondP[0]-firstP[0]
+		y1=secondP[1]-firstP[1]
+		if(Math.abs(x1)>Math.abs(y1)){
+			if(x1>0){
+				leadRight()
+		//		alert("right")
+			}
+			else{
+				leadLeft()
+		//		alert("left")
 			}
 		}
-		for(i=0;i<4;i++){ // merge
-			p=i+3*4;
-			for(j=0;j<4;j++){
-				n=i+(3-j)*4
-				n1=i+(2-j)*4
-				if(a[n]!=0 && a[n1]==a[n]){
-					a[p] = 2*a[n];
-					p-=4
-					j++
-				}
-				else{
-					a[p] = a[n]
-					p-=4
-				}
+		else{
+			if(y1<0){
+				leadTop()
+		//		alert("top")
+			}
+			else{
+				leadBottom()
+		//		alert("bottom")
 			}
 		}
-		for(i=0;i<16;i++){ // copy
-			d2048[i]=a[i]
-		}
+		gene()
 	}
 </script>
-<body>
-<img id="bg" src="beijing.png" display="none"/>
-<img id="n0" src="0.png" display="none" />
-<img id="n2" src="2.png" display="none" />
-<img id="n4" src="4.png" display="none" />
-<img id="n8" src="8.png" display="none" />
-<img id="n16" src="16.png" display="none" />
-<img id="n32" src="32.png" display="none" />
-<img id="n64" src="64.png" display="none" />
-<img id="n128" src="128.png" display="none" />
-<img id="n256" src="256.png" display="none" />
-<img id="n512" src="512.png" display="none" />
-<img id="n1024" src="1024.png" display="none" />
-<img id="n2048" src="2048.png" display="none" />
-<img id="n4096" src="4096.png" display="none" />
-<canvas id="can" width="500" height="500">
+<body onmousedown="pressM(event)" onmouseup="handleMouse(event)">
+<img id="bg" src="beijing.png" style="display:none"/>
+<img id="n0" src="0.png" style="display:none" />
+<img id="n2" src="2.png" style="display:none" />
+<img id="n4" src="4.png" style="display:none" />
+<img id="n8" src="8.png" style="display:none" />
+<img id="n16" src="16.png" style="display:none" />
+<img id="n32" src="32.png" style="display:none" />
+<img id="n64" src="64.png" style="display:none" />
+<img id="n128" src="128.png" style="display:none" />
+<img id="n256" src="256.png" style="display:none" />
+<img id="n512" src="512.png" style="display:none" />
+<img id="n1024" src="1024.png" style="display:none" />
+<img id="n2048" src="2048.png" style="display:none" />
+<img id="n4096" src="4096.png" style="display:none" />
+<canvas id="can" width="500" height="600">
 </canvas>
 <script>
 	var c=document.getElementById("can")
+	beijing = document.getElementById("bg")
 	cxt = c.getContext("2d");
+	img[0] = document.getElementById("n0")
+	for(i=1;i<13;i++){
+		a="n"+Math.pow(2,i)
+		img[i] = document.getElementById("n"+Math.pow(2,i))
+	}
+	window.setInterval("show()",100)
 </script>
 </body>
 </html>
